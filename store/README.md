@@ -15,6 +15,7 @@ Everything App Store Connect asks for, and who has to supply it.
 | Export compliance | `ITSAppUsesNonExemptEncryption: false` in `app.json` |
 | Privacy manifest | `ios.privacyManifests` in `app.json` |
 | Build config | `eas.json` |
+| Screenshot shot list | `store/screenshots.md` |
 
 ## Blocked on the owner
 
@@ -28,10 +29,10 @@ These cannot be produced from the codebase.
    free plan Pages cannot serve a private one.
    - Privacy policy — `https://denislinnik948-lgtm.github.io/flip/privacy.html`
    - Support — `https://denislinnik948-lgtm.github.io/flip/`
-3. **Screenshots.** Required: 6.9" iPhone (1320×2868). Apple reuses those for
-   smaller devices. They must come from a real build — the web preview is not a
-   substitute, and simulator frames are acceptable to Apple but must be genuine
-   app screenshots.
+3. **Screenshots.** Required: 6.9" iPhone (1320×2868). Must come from a real
+   build — this machine has no Xcode, so no simulator. `screenshots.md` fixes
+   the shot list, the order, and how to reach each state, so the only step left
+   is capturing them.
 4. **The app name is `Flip Field`** — confirm it is still free in App Store
    Connect before creating the record, since the name locks to it. "FLIP" alone
    is taken by an existing game. See `listing-en.md` for the reasoning and
