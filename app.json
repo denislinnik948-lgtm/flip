@@ -52,6 +52,11 @@
     ],
     "icon": "./assets/icon.png",
     "description": "A minimalist logic game. Turn every tile on, one move at a time.",
-    "primaryColor": "#2A2A29"
+    "primaryColor": "#2A2A29",
+    "extra": {
+      "eas": {
+        "projectId": "3ccaad7b-27ca-42dc-9246-5ff607f83951"
+      }
+    }
   }
 }
