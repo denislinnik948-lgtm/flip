@@ -1,6 +1,11 @@
 # App Store submission
 
-Everything App Store Connect asks for, and who has to supply it.
+**Handing this to someone else? Start with `HANDOFF.md`** — it is the single
+document that gathers every value to paste into App Store Connect, plus the
+decisions already made.
+
+This file is the underlying checklist: everything App Store Connect asks for,
+and who has to supply it.
 
 ## Ready in this repo
 

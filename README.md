@@ -204,6 +204,16 @@ in two places on purpose: Apple's fixed "Puzzle" category, and the App Store
 keyword list, which is never displayed and exists only for search matching —
 both flagged in `store/`.
 
+## Publishing
+
+`store/HANDOFF.md` is the document to give whoever uploads the app. It carries
+every App Store Connect value, the build commands, and the list of things that
+are deliberately absent so they are not mistaken for gaps.
+
+Two steps remain and both need a real device or Xcode: the build itself, and
+screenshots (`store/screenshots.md` fixes the shot list so the build only has
+to happen once).
+
 ## Icon
 
 `python3 scripts/generate-icons.py` authors the whole set from one derivation —
