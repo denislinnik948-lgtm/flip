@@ -1,0 +1,42 @@
+{
+  "name": "flip",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "FLIP — minimalist mobile puzzle game. Core engine (platform-agnostic TypeScript).",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "generate:campaign": "tsx scripts/generate-campaign.ts",
+    "start": "expo start",
+    "ios": "expo start --ios",
+    "android": "expo start --android",
+    "web": "expo start --web --port 8081"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.2.18",
+    "tsx": "^4.19.2",
+    "typescript": "~6.0.3",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~57.0.15",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "expo": "~57.0.21",
+    "expo-asset": "~57.0.16",
+    "expo-haptics": "~57.0.2",
+    "expo-localization": "~57.0.1",
+    "expo-splash-screen": "^57.0.8",
+    "expo-status-bar": "~57.0.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-svg": "15.15.4",
+    "react-native-web": "^0.21.2"
+  },
+  "main": "index.js"
+}

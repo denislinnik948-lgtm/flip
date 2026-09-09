@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+*.log
+
+# Expo (added in the UI pass)
+.expo/
+dist/
+web-build/

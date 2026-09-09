@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="b45f6d6d-64a7-4820-9588-31999e99847e"></script>
+
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+/* ── FLIP · FINAL VISUAL TOKENS (source of truth for implementation) ──────────
+   COLOR — soft-contrast system (variant B, default)
+     --color-bg            #F7F7F5
+     --color-surface       #FBFBF9   (cards, sheets)
+     --color-off           #E7E7E4   (cell OFF fill)
+     --color-on            #2A2A29   (cell ON fill)
+     --color-text          #2A2A29
+     --color-muted         #8B8B85
+     --color-hairline      #E4E4E0
+     --color-off-edge      rgba(42,42,41,.055)   (cell material separation)
+   Variant A (high contrast, legacy): off #D9D9D5 / on #171717
+   Variant C (extra soft):            off #EDEDEA / on #3A3A38
+   SYMBOL — secondary information, two states
+     idle   OFF rgba(42,42,41,.22)   ON rgba(247,247,245,.24)
+     prev   OFF rgba(42,42,41,.50)   ON rgba(247,247,245,.58)
+   PREVIEW STATE (adaptive, per-cell)
+     ring OFF  inset 0 0 0 1.5px rgba(42,42,41,.40)
+     ring ON   inset 0 0 0 1.5px rgba(247,247,245,.52)
+     scale     affected 1.015 · pressed cell 1.03 · 140ms
+     board state never changes until pointer release
+   GEOMETRY
+     --radius-cell 12px  --radius-card 14px  --radius-sheet 18px
+     --grid-gap 10px  --page-padding 24px  --board-width 82% (max 352px)
+   TYPE — system sans (SF Pro on Apple), weights 400/500/600
+     display 44/34/32px w500 ls -.02em · label 11px w600 ls .14em uppercase
+     meta 10px ls .12em · body 13-15px/1.6
+   MOTION
+     --transition-flip 220ms cubic-bezier(.2,.8,.25,1) · rotateY 180°
+     --flip-stagger 14ms per manhattan step
+     --transition-fast 140ms · sheets 300ms rise 14px
+     home background ticker 2200ms, one tile at a time
+   ──────────────────────────────────────────────────────────────────────────── */
+html, body { margin: 0; padding: 0; background: #EDEDE9; }
+body { font-family: -apple-system, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, system-ui, sans-serif; -webkit-font-smoothing: antialiased; color: #2A2A29; }
+button { font: inherit; color: inherit; background: none; border: none; margin: 0; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button:focus-visible { outline: 1.5px solid #2A2A29; outline-offset: 3px; border-radius: 6px; }
+a { color: #2A2A29; }
+a:hover { color: #6E6E68; }
+svg { display: block; }
+@keyframes flipSheet { from { transform: translateY(14px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+@keyframes flipFade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes hintPulse { 0%,100% { opacity: .3 } 50% { opacity: .95 } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important } }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; display: flex; justify-content: center; background: #EDEDE9">
+  <div style="width: 100%; max-width: 430px; min-height: 100vh; background: #F7F7F5; position: relative; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 0 1px rgba(42,42,41,.05); padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)">
+
+    <sc-if value="{{ isSplash }}" hint-placeholder-val="{{ false }}">
+      <div sc-camel-on-click="{{ skipSplash }}" style="position: absolute; inset: 0; background: #2A2A29; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; animation: flipFade 320ms ease">
+        <div style="flex: 1; display: flex; align-items: center; justify-content: center">
+          <div style="display: flex; gap: 8px">
+            <div style="width: 54px; height: 54px; border-radius: 13px; background: #F7F7F5; color: #2A2A29; font-size: 21px; font-weight: 500; display: flex; align-items: center; justify-content: center; animation: flipSheet 520ms cubic-bezier(.2,.8,.25,1) both">F</div>
+            <div style="width: 54px; height: 54px; border-radius: 13px; background: #F7F7F5; color: #2A2A29; font-size: 21px; font-weight: 500; display: flex; align-items: center; justify-content: center; animation: flipSheet 520ms cubic-bezier(.2,.8,.25,1) 70ms both">L</div>
+            <div style="width: 54px; height: 54px; border-radius: 13px; box-shadow: inset 0 0 0 1.5px rgba(247,247,245,.4); color: #F7F7F5; font-size: 21px; font-weight: 500; display: flex; align-items: center; justify-content: center; animation: flipSheet 520ms cubic-bezier(.2,.8,.25,1) 140ms both">I</div>
+            <div style="width: 54px; height: 54px; border-radius: 13px; background: #F7F7F5; color: #2A2A29; font-size: 21px; font-weight: 500; display: flex; align-items: center; justify-content: center; animation: flipSheet 520ms cubic-bezier(.2,.8,.25,1) 210ms both">P</div>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; padding-bottom: 34px; animation: flipFade 700ms ease 420ms both">
+          <div style="display: flex; align-items: flex-end; gap: 4px">
+            <div style="position: relative; width: 17px; height: 22px">
+              <div style="position: absolute; left: 0; top: 0; width: 5px; height: 22px; background: #F7F7F5"></div>
+              <div style="position: absolute; left: 0; bottom: 0; width: 17px; height: 5px; background: #F7F7F5; clip-path: polygon(0 0, 76% 0, 100% 100%, 0 100%)"></div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 3px">
+              <div style="width: 5px; height: 5px; background: #F7F7F5"></div>
+              <div style="width: 5px; height: 14px; background: #F7F7F5; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 78%)"></div>
+            </div>
+          </div>
+          <div style="font-size: 9px; letter-spacing: .34em; color: rgba(247,247,245,.5)">LI STUDIO</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div style="position: absolute; inset: 0; display: flex; flex-direction: column; animation: flipFade 400ms ease">
+        <sc-if value="{{ showBgGrid }}" hint-placeholder-val="{{ true }}">
+          <div style="position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(to right, rgba(42,42,41,.045) 1px, transparent 1px), linear-gradient(to bottom, rgba(42,42,41,.045) 1px, transparent 1px); background-size: 62px 62px; background-position: left top; mask-image: linear-gradient(to bottom, rgba(0,0,0,.85), rgba(0,0,0,.45) 40%, transparent 62%); -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.85), rgba(0,0,0,.45) 40%, transparent 62%)">
+            <div style="position: absolute; width: 61px; height: 61px; left: {{ accentX }}px; top: {{ accentY }}px; background: rgba(42,42,41,.05); transition: left 1200ms cubic-bezier(.4,0,.2,1), top 1200ms cubic-bezier(.4,0,.2,1), opacity 1200ms ease; opacity: {{ accentOpacity }}"></div>
+          </div>
+        </sc-if>
+
+        <div style="position: relative; flex: 1; display: flex; flex-direction: column; padding: 24px">
+          <div style="flex: .82; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 22px; padding: 40px 0 72px">
+
+            <sc-if value="{{ markTiles }}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; gap: 8px" aria-label="FLIP">
+                <sc-for list="{{ wordTiles }}" as="w" hint-placeholder-count="4">
+                  <div style="width: 56px; height: 56px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 21px; font-weight: 500; letter-spacing: .01em; background: {{ w.bg }}; color: {{ w.fg }}; box-shadow: inset 0 0 0 1px {{ w.edge }}; transition: transform 620ms cubic-bezier(.2,.8,.25,1); transform: rotateY({{ w.deg }}deg)">{{ w.ch }}</div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ markInlay }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; align-items: center; gap: 3px; font-size: 46px; font-weight: 500; letter-spacing: -0.015em" aria-label="FLIP">
+                <span>FL</span>
+                <span style="width: 40px; height: 46px; border-radius: 11px; background: #2A2A29; color: #F7F7F5; font-size: 25px; display: flex; align-items: center; justify-content: center; margin: 0 2px">I</span>
+                <span>P</span>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ markStack }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 14px" aria-label="FLIP">
+                <div style="display: flex; gap: 5px">
+                  <sc-for list="{{ dotTiles }}" as="d" hint-placeholder-count="4">
+                    <div style="width: 13px; height: 13px; border-radius: 4px; background: {{ d.bg }}; transition: background 900ms ease"></div>
+                  </sc-for>
+                </div>
+                <div style="font-size: 42px; font-weight: 500; letter-spacing: .1em">FLIP</div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ showMotif }}" hint-placeholder-val="{{ false }}">
+              <div style="display: grid; grid-template-columns: repeat(3, 15px); gap: 5px; perspective: 300px">
+                <sc-for list="{{ motifTiles }}" as="m" hint-placeholder-count="9">
+                  <div style="width: 15px; height: 15px; border-radius: 5px; background: {{ m.bg }}; transition: transform 520ms cubic-bezier(.2,.8,.25,1), background 520ms ease; transform: rotateY({{ m.deg }}deg)"></div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+
+          <button sc-camel-on-click="{{ goDaily }}" style="width: 100%; text-align: left; padding: 28px 24px 26px; border-radius: 16px; background: #FBFBF9; box-shadow: inset 0 0 0 1px #E4E4E0; display: flex; flex-direction: column; gap: 12px; transition: background 140ms ease" style-hover="background: #F4F4F1">
+            <div style="font-size: 13px; letter-spacing: .16em; font-weight: 600">DAILY FLIP</div>
+            <div style="font-size: 11px; letter-spacing: .12em; color: #8B8B85">{{ dailySub }}</div>
+          </button>
+
+          <div style="flex: 1.35"></div>
+
+          <button sc-camel-on-click="{{ goPlay }}" style="width: 100%; height: 62px; border-radius: 14px; background: #2A2A29; color: #F7F7F5; font-size: 12px; letter-spacing: .18em; font-weight: 600; display: flex; align-items: center; justify-content: center; transition: transform 140ms ease" style-active="transform: scale(.985)">{{ playLabel }}</button>
+
+          <div style="display: flex; gap: 8px; margin-top: 14px">
+            <button sc-camel-on-click="{{ goLevels }}" style="flex: 1; height: 48px; border-radius: 12px; background: #FBFBF9; box-shadow: inset 0 0 0 1px #E4E4E0; font-size: 11px; letter-spacing: .14em; color: #6E6E68; display: flex; align-items: center; justify-content: center; gap: 9px" style-hover="background: #F2F2EF">
+              <svg width="15" height="15" sc-camel-view-box="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.75" y="2.75" width="5.5" height="5.5" rx="1.6"></rect><rect x="9.75" y="2.75" width="5.5" height="5.5" rx="1.6"></rect><rect x="2.75" y="9.75" width="5.5" height="5.5" rx="1.6"></rect><rect x="9.75" y="9.75" width="5.5" height="5.5" rx="1.6"></rect></svg>
+              <span>LEVELS</span>
+            </button>
+            <button sc-camel-on-click="{{ goSettings }}" style="flex: 1; height: 48px; border-radius: 12px; background: #FBFBF9; box-shadow: inset 0 0 0 1px #E4E4E0; font-size: 11px; letter-spacing: .14em; color: #6E6E68; display: flex; align-items: center; justify-content: center; gap: 9px" style-hover="background: #F2F2EF">
+              <svg width="15" height="15" sc-camel-view-box="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M2.5 5.5h13M2.5 12.5h13"></path><circle cx="6.5" cy="5.5" r="1.9" fill="#F7F7F5"></circle><circle cx="11.5" cy="12.5" r="1.9" fill="#F7F7F5"></circle></svg>
+              <span>SETTINGS</span>
+            </button>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 30px 0 16px">
+            <div style="display: flex; align-items: flex-end; gap: 3px; opacity: .42">
+              <div style="position: relative; width: 13px; height: 17px">
+                <div style="position: absolute; left: 0; top: 0; width: 4px; height: 17px; background: #2A2A29"></div>
+                <div style="position: absolute; left: 0; bottom: 0; width: 13px; height: 4px; background: #2A2A29; clip-path: polygon(0 0, 76% 0, 100% 100%, 0 100%)"></div>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 2px">
+                <div style="width: 4px; height: 4px; background: #2A2A29"></div>
+                <div style="width: 4px; height: 11px; background: #2A2A29; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 78%)"></div>
+              </div>
+            </div>
+            <div style="font-size: 8px; letter-spacing: .3em; color: #A9A9A3">LI STUDIO</div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isGame }}" hint-placeholder-val="{{ false }}">
+      <div style="flex: 1; display: flex; flex-direction: column; padding: 12px 24px 24px; animation: flipFade 200ms ease">
+        <div style="height: 44px; display: flex; align-items: center">
+          <button sc-camel-on-click="{{ goHome }}" style="width: 44px; height: 44px; margin-left: -13px; display: flex; align-items: center; justify-content: center; color: #8B8B85" aria-label="Back">
+            <svg width="19" height="19" sc-camel-view-box="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4l-5 5 5 5"></path></svg>
+          </button>
+        </div>
+
+        <div style="display: flex; align-items: baseline; justify-content: space-between; padding-top: 2px">
+          <div style="font-size: 11px; letter-spacing: .14em; font-weight: 600">{{ gameTitle }}</div>
+          <div style="font-size: 11px; letter-spacing: .14em; color: #6E6E68">{{ movesLabel }}</div>
+        </div>
+
+        <div style="flex: 1; display: flex; align-items: center; justify-content: center">
+          <div style="width: 82%; max-width: 352px; display: grid; grid-template-columns: repeat({{ size }}, 1fr); gap: {{ gap }}px" role="grid">
+            <sc-for list="{{ cells }}" as="c" hint-placeholder-count="16">
+              <div style="position: relative; aspect-ratio: 1 / 1; perspective: 640px; transition: transform 140ms cubic-bezier(.2,.8,.25,1); transform: scale({{ c.scale }})">
+                <sc-if value="{{ c.prev }}" hint-placeholder-val="{{ false }}">
+                  <div style="position: absolute; inset: 0; pointer-events: none; z-index: 0">
+                    <sc-if value="{{ c.lnR }}" hint-placeholder-val="{{ false }}">
+                      <div style="position: absolute; top: 50%; left: 88%; width: calc(24% + {{ gap }}px); height: 1.5px; margin-top: -0.75px; background: {{ pal.lineGap }}"></div>
+                    </sc-if>
+                    <sc-if value="{{ c.lnD }}" hint-placeholder-val="{{ false }}">
+                      <div style="position: absolute; left: 50%; top: 88%; height: calc(24% + {{ gap }}px); width: 1.5px; margin-left: -0.75px; background: {{ pal.lineGap }}"></div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+                <button sc-camel-on-pointer-down="{{ c.down }}" sc-camel-on-pointer-up="{{ c.up }}" sc-camel-on-pointer-move="{{ c.move }}" sc-camel-on-pointer-leave="{{ c.cancel }}" sc-camel-on-pointer-cancel="{{ c.cancel }}" sc-camel-on-context-menu="{{ c.noMenu }}" aria-label="{{ c.label }}" style="position: absolute; inset: 0; z-index: 1; border-radius: 12px; transform-style: preserve-3d; transition: transform {{ dur }}ms cubic-bezier(.2,.8,.25,1); transform: rotateY({{ c.deg }}deg); transition-delay: {{ c.delay }}ms; touch-action: manipulation; user-select: none">
+                  <div style="position: absolute; inset: 0; border-radius: 12px; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; font-size: 16px; line-height: 1; background: {{ pal.off }}; color: {{ c.symOff }}; box-shadow: inset 0 0 0 1px {{ pal.offEdge }}; transition: color 140ms ease">{{ c.sym }}</div>
+                  <div style="position: absolute; inset: 0; border-radius: 12px; backface-visibility: hidden; transform: rotateY(180deg); display: flex; align-items: center; justify-content: center; font-size: 16px; line-height: 1; background: {{ pal.on }}; color: {{ c.symOn }}; transition: color 140ms ease">{{ c.sym }}</div>
+                </button>
+
+                <sc-if value="{{ c.hint }}" hint-placeholder-val="{{ false }}">
+                  <div style="position: absolute; inset: -4px; border-radius: 15px; box-shadow: 0 0 0 1.5px #2A2A29; pointer-events: none; animation: hintPulse 1.6s ease-in-out infinite"></div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; min-height: 44px">
+          <button sc-camel-on-click="{{ doRestart }}" style="height: 44px; display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: .14em; color: #8B8B85" style-hover="color: #2A2A29">
+            <svg width="15" height="15" sc-camel-view-box="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 9a6 6 0 1 1-1.9-4.4"></path><path d="M15.2 3.2v3.5h-3.5"></path></svg>
+            <span>RESTART</span>
+          </button>
+          <button sc-camel-on-click="{{ doHint }}" style="height: 44px; display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: .14em; color: #8B8B85" style-hover="color: #2A2A29">
+            <svg width="15" height="15" sc-camel-view-box="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.6a4.3 4.3 0 0 1 2.6 7.7c-.5.4-.8 1-.8 1.6H7.2c0-.6-.3-1.2-.8-1.6A4.3 4.3 0 0 1 9 2.6Z"></path><path d="M7.5 14.4h3"></path></svg>
+            <span>HINT</span>
+            <sc-if value="{{ hintCostly }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size: 9px; letter-spacing: .1em; color: #B3B3AD; box-shadow: inset 0 0 0 1px #E4E4E0; border-radius: 5px; padding: 3px 5px">AD</span>
+            </sc-if>
+          </button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isLevels }}" hint-placeholder-val="{{ false }}">
+      <div style="flex: 1; display: flex; flex-direction: column; padding: 12px 24px 24px; animation: flipFade 200ms ease">
+        <div style="height: 44px; display: flex; align-items: center">
+          <button sc-camel-on-click="{{ goHome }}" style="width: 44px; height: 44px; margin-left: -13px; display: flex; align-items: center; justify-content: center; color: #8B8B85" aria-label="Back">
+            <svg width="19" height="19" sc-camel-view-box="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4l-5 5 5 5"></path></svg>
+          </button>
+        </div>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 2px 0 24px">
+          <div style="font-size: 11px; letter-spacing: .14em; font-weight: 600">LEVELS</div>
+          <div style="font-size: 10px; letter-spacing: .12em; color: #8B8B85">{{ levelsMeta }}</div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 9px; padding-bottom: 8px">
+          <sc-for list="{{ levelList }}" as="l" hint-placeholder-count="25">
+            <sc-if value="{{ l.done }}" hint-placeholder-val="{{ false }}">
+              <button sc-camel-on-click="{{ l.open }}" style="aspect-ratio: 1 / 1; border-radius: 12px; background: #2A2A29; color: #F7F7F5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px">
+                <span style="font-size: 12px; letter-spacing: .03em">{{ l.label }}</span>
+                <span style="font-size: 8px; letter-spacing: .1em; color: rgba(247,247,245,.5)">{{ l.best }}</span>
+              </button>
+            </sc-if>
+            <sc-if value="{{ l.current }}" hint-placeholder-val="{{ true }}">
+              <button sc-camel-on-click="{{ l.open }}" style="aspect-ratio: 1 / 1; border-radius: 12px; background: #FBFBF9; box-shadow: inset 0 0 0 1.5px #2A2A29; font-size: 12px; letter-spacing: .03em; font-weight: 500; display: flex; align-items: center; justify-content: center">{{ l.label }}</button>
+            </sc-if>
+            <sc-if value="{{ l.locked }}" hint-placeholder-val="{{ false }}">
+              <div style="aspect-ratio: 1 / 1; border-radius: 12px; background: #EFEFEC; color: #BFBFB9; font-size: 12px; letter-spacing: .03em; display: flex; align-items: center; justify-content: center">{{ l.label }}</div>
+            </sc-if>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+      <div style="flex: 1; display: flex; flex-direction: column; padding: 12px 24px 24px; animation: flipFade 200ms ease">
+        <div style="height: 44px; display: flex; align-items: center">
+          <button sc-camel-on-click="{{ goHome }}" style="width: 44px; height: 44px; margin-left: -13px; display: flex; align-items: center; justify-content: center; color: #8B8B85" aria-label="Back">
+            <svg width="19" height="19" sc-camel-view-box="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4l-5 5 5 5"></path></svg>
+          </button>
+        </div>
+        <div style="font-size: 11px; letter-spacing: .14em; font-weight: 600; padding: 2px 0 24px">SETTINGS</div>
+        <div style="display: flex; flex-direction: column">
+          <button sc-camel-on-click="{{ toggleSound }}" style="display: flex; align-items: center; justify-content: space-between; height: 56px; box-shadow: inset 0 -1px 0 #E4E4E0">
+            <span style="font-size: 13px">Sound</span>
+            <span style="font-size: 11px; letter-spacing: .14em; color: #6E6E68">{{ soundLabel }}</span>
+          </button>
+          <button sc-camel-on-click="{{ toggleHaptics }}" style="display: flex; align-items: center; justify-content: space-between; height: 56px; box-shadow: inset 0 -1px 0 #E4E4E0">
+            <span style="font-size: 13px">Haptics</span>
+            <span style="font-size: 11px; letter-spacing: .14em; color: #6E6E68">{{ hapticsLabel }}</span>
+          </button>
+          <div style="height: 20px"></div>
+          <button style="display: flex; align-items: center; justify-content: space-between; height: 56px; box-shadow: inset 0 -1px 0 #E4E4E0">
+            <span style="font-size: 13px">Remove Ads</span>
+            <svg width="16" height="16" sc-camel-view-box="0 0 18 18" fill="none" stroke="#B3B3AD" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9h11M10 4.5l4.5 4.5L10 13.5"></path></svg>
+          </button>
+          <button sc-camel-on-click="{{ goAbout }}" style="display: flex; align-items: center; justify-content: space-between; height: 56px; box-shadow: inset 0 -1px 0 #E4E4E0">
+            <span style="font-size: 13px">About FLIP</span>
+            <svg width="16" height="16" sc-camel-view-box="0 0 18 18" fill="none" stroke="#B3B3AD" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9h11M10 4.5l4.5 4.5L10 13.5"></path></svg>
+          </button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}">
+      <div style="flex: 1; display: flex; flex-direction: column; padding: 12px 24px 24px; animation: flipFade 200ms ease">
+        <div style="height: 44px; display: flex; align-items: center">
+          <button sc-camel-on-click="{{ goSettings }}" style="width: 44px; height: 44px; margin-left: -13px; display: flex; align-items: center; justify-content: center; color: #8B8B85" aria-label="Back">
+            <svg width="19" height="19" sc-camel-view-box="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4l-5 5 5 5"></path></svg>
+          </button>
+        </div>
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 22px; padding-bottom: 40px">
+          <div style="display: flex; gap: 6px">
+            <div style="width: 34px; height: 34px; border-radius: 9px; background: #E7E7E4; box-shadow: inset 0 0 0 1px rgba(42,42,41,.055); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500">F</div>
+            <div style="width: 34px; height: 34px; border-radius: 9px; background: #E7E7E4; box-shadow: inset 0 0 0 1px rgba(42,42,41,.055); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500">L</div>
+            <div style="width: 34px; height: 34px; border-radius: 9px; background: #2A2A29; color: #F7F7F5; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500">I</div>
+            <div style="width: 34px; height: 34px; border-radius: 9px; background: #E7E7E4; box-shadow: inset 0 0 0 1px rgba(42,42,41,.055); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500">P</div>
+          </div>
+          <div style="font-size: 15px; line-height: 1.6; color: #4A4A45; max-width: 250px; text-wrap: pretty">A simple puzzle about<br>one move at a time.</div>
+          <div style="font-size: 10px; letter-spacing: .12em; color: #8B8B85">VERSION 1.0.0</div>
+        </div>
+        <div style="display: flex; gap: 20px; font-size: 11px; letter-spacing: .1em; color: #8B8B85">
+          <span>Privacy Policy</span>
+          <span>Terms</span>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isDailyDone }}" hint-placeholder-val="{{ false }}">
+      <div style="flex: 1; display: flex; flex-direction: column; padding: 24px; animation: flipFade 240ms ease">
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 26px">
+          <div style="font-size: 11px; letter-spacing: .16em; font-weight: 600">DAILY COMPLETE</div>
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <div style="font-size: 34px; font-weight: 500; letter-spacing: -0.02em">{{ dailyDoneMoves }}</div>
+            <div style="font-size: 10px; letter-spacing: .14em; color: #8B8B85">{{ dailyDoneBest }}</div>
+          </div>
+          <div style="font-size: 10px; letter-spacing: .12em; color: #8B8B85">COME BACK TOMORROW</div>
+        </div>
+        <button sc-camel-on-click="{{ goHome }}" style="width: 100%; height: 56px; border-radius: 14px; box-shadow: inset 0 0 0 1px #E4E4E0; font-size: 11px; letter-spacing: .16em">HOME</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showComplete }}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; inset: 0; background: rgba(247,247,245,.86); backdrop-filter: blur(6px); display: flex; flex-direction: column; justify-content: flex-end; padding: 24px; animation: flipFade 220ms ease">
+        <div style="background: #FBFBF9; box-shadow: inset 0 0 0 1px #E4E4E0; border-radius: 18px; padding: 30px 26px 24px; display: flex; flex-direction: column; gap: 24px; animation: flipSheet 300ms cubic-bezier(.2,.8,.25,1)">
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <div style="font-size: 11px; letter-spacing: .18em; font-weight: 600">COMPLETE</div>
+            <sc-if value="{{ isRecord }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size: 10px; letter-spacing: .16em; color: #8B8B85">NEW BEST</div>
+            </sc-if>
+          </div>
+          <div style="font-size: 20px; letter-spacing: .14em; line-height: 1; color: #2A2A29">
+            <span>{{ starsOn }}</span><span style="color: #DCDCD6">{{ starsOff }}</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 7px">
+            <div style="font-size: 28px; font-weight: 500; letter-spacing: -0.01em">{{ resultMoves }}</div>
+            <div style="font-size: 10px; letter-spacing: .14em; color: #8B8B85">{{ resultBest }}</div>
+          </div>
+          <button sc-camel-on-click="{{ doNext }}" style="width: 100%; height: 56px; border-radius: 13px; background: #2A2A29; color: #F7F7F5; font-size: 11px; letter-spacing: .16em; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px">
+            <span>{{ nextLabel }}</span>
+            <svg width="16" height="16" sc-camel-view-box="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9h11M10 4.5l4.5 4.5L10 13.5"></path></svg>
+          </button>
+          <button sc-camel-on-click="{{ goHome }}" style="font-size: 11px; letter-spacing: .14em; color: #8B8B85; height: 24px">HOME</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ adOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; inset: 0; background: rgba(42,42,41,.45); display: flex; align-items: center; justify-content: center; padding: 24px; animation: flipFade 180ms ease">
+        <div style="width: 100%; background: #F7F7F5; border-radius: 18px; padding: 26px 24px 22px; display: flex; flex-direction: column; gap: 22px; animation: flipSheet 280ms cubic-bezier(.2,.8,.25,1)">
+          <div style="display: flex; flex-direction: column; gap: 9px">
+            <div style="font-size: 11px; letter-spacing: .16em; font-weight: 600">REWARDED AD</div>
+            <div style="font-size: 12px; letter-spacing: .03em; color: #8B8B85; line-height: 1.5">Watch a short ad to unlock another hint.</div>
+          </div>
+          <sc-if value="{{ adPlaying }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 12px">
+              <div style="height: 3px; border-radius: 2px; background: #E4E4E0; overflow: hidden">
+                <div style="height: 100%; background: #2A2A29; width: {{ adPct }}%; transition: width 120ms linear"></div>
+              </div>
+              <div style="font-size: 10px; letter-spacing: .14em; color: #8B8B85">{{ adCountdown }}</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ adIdle }}" hint-placeholder-val="{{ true }}">
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <button sc-camel-on-click="{{ startAd }}" style="width: 100%; height: 52px; border-radius: 13px; background: #2A2A29; color: #F7F7F5; font-size: 11px; letter-spacing: .16em; font-weight: 600">WATCH AD</button>
+              <button sc-camel-on-click="{{ closeAd }}" style="width: 100%; height: 44px; font-size: 11px; letter-spacing: .14em; color: #8B8B85">NOT NOW</button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:900},&quot;contrast&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;A — high&quot;,&quot;B — soft&quot;,&quot;C — extra soft&quot;],&quot;default&quot;:&quot;B — soft&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Board&quot;},&quot;wordmark&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;tiles — four letter tiles&quot;,&quot;inlay — flipped I tile&quot;,&quot;marker — tile row + wordmark&quot;],&quot;default&quot;:&quot;tiles — four letter tiles&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Identity&quot;},&quot;homeBackground&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;subtle grid&quot;,&quot;grid + 3×3 motif&quot;,&quot;none&quot;],&quot;default&quot;:&quot;subtle grid&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Identity&quot;},&quot;showSplash&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Identity&quot;},&quot;flipDuration&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:400,&quot;min&quot;:140,&quot;max&quot;:400,&quot;step&quot;:10,&quot;unit&quot;:&quot;ms&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Motion&quot;},&quot;stagger&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:32,&quot;min&quot;:0,&quot;max&quot;:40,&quot;step&quot;:2,&quot;unit&quot;:&quot;ms&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Motion&quot;},&quot;gridGap&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:8,&quot;min&quot;:4,&quot;max&quot;:20,&quot;step&quot;:1,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Board&quot;},&quot;showSymbols&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Board&quot;},&quot;demoProgress&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:77,&quot;min&quot;:0,&quot;max&quot;:120,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Prototype&quot;}}">
+const SYM = { cross: '+', row: '—', col: '│' };
+const KEY = 'flip_proto_v2';
+
+const PAL = {
+  A: { off: '#D9D9D5', on: '#171717', offEdge: 'rgba(23,23,23,.07)',
+       symOffIdle: 'rgba(23,23,23,.24)', symOffPrev: 'rgba(23,23,23,.52)',
+       symOnIdle: 'rgba(245,245,243,.26)', symOnPrev: 'rgba(245,245,243,.6)',
+       lineOff: 'rgba(23,23,23,.5)', lineOn: 'rgba(245,245,243,.62)', lineGap: 'rgba(23,23,23,.32)' },
+  B: { off: '#E7E7E4', on: '#2A2A29', offEdge: 'rgba(42,42,41,.055)',
+       symOffIdle: 'rgba(42,42,41,.22)', symOffPrev: 'rgba(42,42,41,.5)',
+       symOnIdle: 'rgba(247,247,245,.24)', symOnPrev: 'rgba(247,247,245,.58)',
+       lineOff: 'rgba(42,42,41,.46)', lineOn: 'rgba(247,247,245,.6)', lineGap: 'rgba(42,42,41,.28)' },
+  C: { off: '#EDEDEA', on: '#3A3A38', offEdge: 'rgba(42,42,41,.07)',
+       symOffIdle: 'rgba(42,42,41,.2)', symOffPrev: 'rgba(42,42,41,.46)',
+       symOnIdle: 'rgba(247,247,245,.26)', symOnPrev: 'rgba(247,247,245,.6)',
+       lineOff: 'rgba(42,42,41,.42)', lineOn: 'rgba(247,247,245,.62)', lineGap: 'rgba(42,42,41,.26)' }
+};
+
+function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+// 1–30 curated campaign, 31+ procedural — invisible to the player.
+function levelSize(n) {
+  if (n <= 10) return 3;
+  if (n <= 20) return 4;
+  if (n <= 30) return 5;
+  return [4, 5, 5, 3, 5, 4, 5][n % 7];
+}
+function levelPar(n) { const s = levelSize(n); return Math.max(3, Math.min(s * s - 2, 9, 2 + Math.floor(n / 4))); }
+
+function affected(mech, size, i) {
+  const r = Math.floor(i / size), c = i % size, out = [];
+  if (mech[i] === 'row') { for (let x = 0; x < size; x++) out.push(r * size + x); }
+  else if (mech[i] === 'col') { for (let y = 0; y < size; y++) out.push(y * size + c); }
+  else {
+    out.push(i);
+    if (r > 0) out.push((r - 1) * size + c);
+    if (r < size - 1) out.push((r + 1) * size + c);
+    if (c > 0) out.push(r * size + c - 1);
+    if (c < size - 1) out.push(r * size + c + 1);
+  }
+  return out;
+}
+
+function buildPuzzle(seed, size, par) {
+  for (let attempt = 0; attempt < 12; attempt++) {
+    const rand = rng(seed + attempt * 7919);
+    const n = size * size;
+    const mech = [];
+    for (let i = 0; i < n; i++) { const p = rand(); mech.push(p < 0.52 ? 'cross' : p < 0.78 ? 'row' : 'col'); }
+    const pool = []; for (let i = 0; i < n; i++) pool.push(i);
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); const t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+    const picks = pool.slice(0, Math.min(par, n));
+    const grid = new Array(n).fill(true);
+    picks.forEach(i => affected(mech, size, i).forEach(k => { grid[k] = !grid[k]; }));
+    if (grid.some(v => !v)) return { size, mech, grid, solution: picks.slice(), par: picks.length };
+  }
+  return { size, mech: new Array(size * size).fill('cross'), grid: new Array(size * size).fill(false), solution: [], par };
+}
+
+function seedFor(mode, level) { return mode === 'daily' ? 20260908 : level * 1013 + 17; }
+
+class Component extends DCLogic {
+  state = {
+    screen: 'splash', mode: 'level', level: 1,
+    size: 3, mech: [], grid: [], solution: [], par: 3, start: null,
+    moves: 0, hintCell: null, hintsUsed: 0, stagger: {}, press: null,
+    adOpen: false, adPlaying: false, adPct: 0, adLeft: 5,
+    complete: false, isRecord: false, resultMovesN: 0,
+    bests: {}, dailyBest: null, dailyMoves: null, dailyDone: false,
+    sound: true, haptics: true,
+    bgFlips: {}, motif: {}, tick: 0
+  };
+
+  componentDidMount() {
+    let loaded = false;
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) {
+        const s = JSON.parse(raw);
+        if (s && s.bests) {
+          loaded = true;
+          this.setState({ bests: s.bests, dailyBest: s.dailyBest ?? null, dailyMoves: s.dailyMoves ?? null, dailyDone: !!s.dailyDone, sound: s.sound !== false, haptics: s.haptics !== false });
+        }
+      }
+    } catch (e) {}
+    if (!loaded) this.seedProgress();
+    this.ticker = setInterval(() => this.tick(), 2200);
+    if (this.props.showSplash === false) this.setState({ screen: 'home' });
+    else this._splash = setTimeout(() => { if (this.state.screen === 'splash') this.setState({ screen: 'home' }); }, 2100);
+  }
+  componentWillUnmount() { clearInterval(this.ticker); clearInterval(this._ad); clearTimeout(this._done); clearTimeout(this._splash); }
+
+  // Prototype starts mid-campaign so the endless level select is demonstrable.
+  seedProgress() {
+    const upTo = this.props.demoProgress ?? 77;
+    const rand = rng(4242);
+    const bests = {};
+    for (let n = 1; n <= upTo; n++) bests['L' + n] = levelPar(n) + Math.floor(rand() * 3);
+    this.setState({ bests });
+    this.persist({ bests });
+  }
+
+  persist(extra) {
+    const s = { ...this.state, ...extra };
+    try { localStorage.setItem(KEY, JSON.stringify({ bests: s.bests, dailyBest: s.dailyBest, dailyMoves: s.dailyMoves, dailyDone: s.dailyDone, sound: s.sound, haptics: s.haptics })); } catch (e) {}
+  }
+
+  tick() {
+    if (this.state.screen !== 'home') return;
+    const t = this.state.tick + 1;
+    const rand = rng(9001 + t * 131);
+    const motif = { ...this.state.motif };
+    const m = Math.floor(rand() * 9);
+    motif[m] = !motif[m];
+    this.setState({ tick: t, motif, accent: { x: Math.floor(rand() * 6), y: Math.floor(rand() * 7), on: rand() > 0.35 } });
+  }
+
+  highest() {
+    const ns = Object.keys(this.state.bests).filter(k => k[0] === 'L').map(k => +k.slice(1));
+    return ns.length ? Math.max(...ns) : 0;
+  }
+
+  load(mode, opts) {
+    const o = opts || {};
+    const level = o.level || this.state.level;
+    const size = mode === 'daily' ? 4 : levelSize(level);
+    const par = mode === 'daily' ? 6 : levelPar(level);
+    const p = buildPuzzle(seedFor(mode, level), size, par);
+    this.setState({ screen: 'game', mode, level, size: p.size, mech: p.mech, grid: p.grid, solution: p.solution, par: p.par, start: p.grid.slice(), moves: 0, hintCell: null, hintsUsed: 0, complete: false, isRecord: false, press: null, stagger: {}, adOpen: false, adPlaying: false });
+  }
+
+  tap(i) {
+    const st = this.state;
+    if (st.complete) return;
+    const list = affected(st.mech, st.size, i);
+    const grid = st.grid.slice();
+    const stagger = {};
+    const cr = Math.floor(i / st.size), cc = i % st.size;
+    list.forEach(k => {
+      grid[k] = !grid[k];
+      const d = Math.abs(Math.floor(k / st.size) - cr) + Math.abs((k % st.size) - cc);
+      stagger[k] = d * (this.props.stagger ?? 14);
+    });
+    const sol = st.solution.includes(i) ? st.solution.filter(x => x !== i) : st.solution.concat([i]);
+    const moves = st.moves + 1;
+    this.setState({ grid, solution: sol, moves, stagger, hintCell: null });
+    if (grid.every(v => v)) {
+      clearTimeout(this._done);
+      this._done = setTimeout(() => this.finish(moves), (this.props.flipDuration ?? 220) + 280);
+    }
+  }
+
+  finish(moves) {
+    const st = this.state;
+    if (st.mode === 'daily') {
+      const best = st.dailyBest == null ? moves : Math.min(st.dailyBest, moves);
+      this.setState({ screen: 'dailyDone', dailyDone: true, dailyMoves: moves, dailyBest: best, complete: false });
+      this.persist({ dailyDone: true, dailyMoves: moves, dailyBest: best }); return;
+    }
+    const key = 'L' + st.level;
+    const prev = st.bests[key];
+    const isRecord = prev != null && moves < prev;
+    const bests = { ...st.bests, [key]: prev == null ? moves : Math.min(prev, moves) };
+    this.setState({ complete: true, isRecord, resultMovesN: moves, bests });
+    this.persist({ bests });
+  }
+
+  hint() {
+    if (this.state.complete) return;
+    if (this.state.hintsUsed >= 1) { this.setState({ adOpen: true, adPlaying: false, adPct: 0, adLeft: 5 }); return; }
+    this.reveal();
+  }
+  reveal() {
+    const st = this.state;
+    this.setState({ hintCell: st.solution.length ? st.solution[0] : null, hintsUsed: st.hintsUsed + 1, adOpen: false, adPlaying: false });
+  }
+  runAd() {
+    this.setState({ adPlaying: true, adPct: 0, adLeft: 3 });
+    clearInterval(this._ad);
+    const t0 = Date.now();
+    this._ad = setInterval(() => {
+      const pct = Math.min(100, ((Date.now() - t0) / 2600) * 100);
+      this.setState({ adPct: pct, adLeft: Math.max(0, Math.ceil((2600 - (Date.now() - t0)) / 1000)) });
+      if (pct >= 100) { clearInterval(this._ad); this.reveal(); }
+    }, 90);
+  }
+
+  renderVals() {
+    const st = this.state;
+    const pal = PAL[this.props.contrast === 'A — high' ? 'A' : this.props.contrast === 'C — extra soft' ? 'C' : 'B'];
+    const dur = this.props.flipDuration ?? 220;
+    const gap = this.props.gridGap ?? 10;
+    const showSymbols = this.props.showSymbols ?? true;
+    const prevSet = st.press != null && st.mech.length ? affected(st.mech, st.size, st.press) : [];
+
+    const cells = st.grid.map((on, i) => {
+      const inPrev = prevSet.includes(i);
+      const r = Math.floor(i / st.size), c = i % st.size;
+      const lnR = inPrev && c < st.size - 1 && prevSet.includes(i + 1);
+      const lnL = inPrev && c > 0 && prevSet.includes(i - 1);
+      const lnD = inPrev && r < st.size - 1 && prevSet.includes(i + st.size);
+      const lnU = inPrev && r > 0 && prevSet.includes(i - st.size);
+      return {
+        i, deg: on ? 180 : 0, sym: showSymbols ? SYM[st.mech[i]] : '',
+        delay: st.stagger[i] || 0,
+        prev: inPrev, hint: st.hintCell === i,
+        lnR, lnL, lnD, lnU, endCap: inPrev && !lnR && !lnL && !lnD && !lnU,
+        line: on ? pal.lineOn : pal.lineOff,
+        symOff: inPrev ? pal.symOffPrev : pal.symOffIdle,
+        symOn: inPrev ? pal.symOnPrev : pal.symOnIdle,
+        scale: st.press === i ? 1.03 : inPrev ? 1.015 : 1,
+        label: (st.mech[i] || 'cross') + ' cell, ' + (on ? 'on' : 'off'),
+        down: e => { this._p = { x: e.clientX, y: e.clientY, i }; this.setState({ press: i }); },
+        move: e => { if (this._p && Math.hypot(e.clientX - this._p.x, e.clientY - this._p.y) > 12) { this._p = null; this.setState({ press: null }); } },
+        up: () => { const p = this._p; this._p = null; this.setState({ press: null }); if (p && p.i === i) this.tap(i); },
+        cancel: () => { this._p = null; if (this.state.press != null) this.setState({ press: null }); },
+        noMenu: e => e.preventDefault()
+      };
+    });
+
+    const highest = this.highest();
+    const current = highest + 1;
+    const levelList = [];
+    for (let n = 1; n <= current + 1; n++) {
+      const done = st.bests['L' + n] != null;
+      levelList.push({
+        n, label: String(n).padStart(2, '0'), done, current: !done && n === current, locked: !done && n > current,
+        best: done ? String(st.bests['L' + n]) : '', open: () => this.load('level', { level: n })
+      });
+    }
+
+    const mark = this.props.wordmark || 'tiles — four letter tiles';
+    const wordChars = ['F', 'L', 'I', 'P'];
+    const wordTiles = wordChars.map((ch, i) => {
+      const flipped = i === 2;
+      return { ch, deg: 0, bg: flipped ? pal.on : pal.off, fg: flipped ? '#F7F7F5' : '#2A2A29', edge: flipped ? 'transparent' : pal.offEdge };
+    });
+    const dotTiles = [0, 1, 2, 3].map(i => ({ bg: st.motif[i] ? '#2A2A29' : '#DCDCD6' }));
+    const acc = st.accent || { x: 2, y: 1, on: true };
+    const motifTiles = [];
+    for (let i = 0; i < 9; i++) motifTiles.push({ deg: st.motif[i] ? 180 : 0, bg: st.motif[i] ? 'rgba(42,42,41,.55)' : 'rgba(42,42,41,.13)' });
+
+    const stars = st.resultMovesN <= st.par ? 3 : st.resultMovesN <= st.par + 2 ? 2 : 1;
+    const best = st.bests['L' + st.level];
+
+    return {
+      pal,
+      isSplash: st.screen === 'splash',
+      skipSplash: () => { clearTimeout(this._splash); this.setState({ screen: 'home' }); },
+      isHome: st.screen === 'home', isGame: st.screen === 'game', isLevels: st.screen === 'levels',
+      isSettings: st.screen === 'settings', isAbout: st.screen === 'about', isDailyDone: st.screen === 'dailyDone',
+      cells, size: st.size, gap, dur,
+      gameTitle: st.mode === 'daily' ? 'DAILY FLIP' : 'LEVEL ' + String(st.level).padStart(2, '0'),
+      movesLabel: st.moves + (st.moves === 1 ? ' MOVE' : ' MOVES'),
+      hintCostly: st.hintsUsed >= 1,
+      dailySub: st.dailyDone ? st.dailyMoves + ' MOVES · BEST ' + st.dailyBest : "TODAY'S PUZZLE",
+      dailyDoneMoves: st.dailyMoves + (st.dailyMoves === 1 ? ' MOVE' : ' MOVES'),
+      dailyDoneBest: 'BEST ' + st.dailyBest,
+      playLabel: 'PLAY',
+      showComplete: st.complete, isRecord: st.isRecord,
+      starsOn: '★★★'.slice(0, stars), starsOff: '★★★'.slice(stars),
+      resultMoves: st.resultMovesN + (st.resultMovesN === 1 ? ' MOVE' : ' MOVES'),
+      resultBest: 'BEST ' + (best == null ? st.resultMovesN : best),
+      nextLabel: 'NEXT LEVEL',
+      levelList, levelsMeta: 'LEVEL ' + String(current).padStart(2, '0'),
+      showBgGrid: (this.props.homeBackground ?? 'subtle grid') !== 'none',
+      showMotif: (this.props.homeBackground ?? 'subtle grid') === 'grid + 3×3 motif',
+      markTiles: mark.indexOf('tiles') === 0, markInlay: mark.indexOf('inlay') === 0, markStack: mark.indexOf('marker') === 0,
+      wordTiles, dotTiles, motifTiles,
+      accentX: acc.x * 62 + 1, accentY: acc.y * 62 + 1, accentOpacity: acc.on ? 1 : 0,
+      soundLabel: st.sound ? 'ON' : 'OFF', hapticsLabel: st.haptics ? 'ON' : 'OFF',
+      adOpen: st.adOpen, adPlaying: st.adPlaying, adIdle: st.adOpen && !st.adPlaying,
+      adPct: st.adPct, adCountdown: st.adLeft + 'S REMAINING',
+      goHome: () => this.setState({ screen: 'home', complete: false, adOpen: false }),
+      goPlay: () => this.load('level', { level: current }),
+      goDaily: () => { if (st.dailyDone) this.setState({ screen: 'dailyDone' }); else this.load('daily', {}); },
+      goLevels: () => this.setState({ screen: 'levels', complete: false }),
+      goSettings: () => this.setState({ screen: 'settings' }),
+      goAbout: () => this.setState({ screen: 'about' }),
+      doRestart: () => {
+        const p = buildPuzzle(seedFor(st.mode, st.level), st.size, st.par);
+        this.setState({ grid: st.start.slice(), solution: p.solution, moves: 0, hintCell: null, hintsUsed: 0, stagger: {}, complete: false });
+      },
+      doHint: () => this.hint(),
+      doNext: () => this.load('level', { level: st.level + 1 }),
+      startAd: () => this.runAd(), closeAd: () => this.setState({ adOpen: false }),
+      toggleSound: () => { const v = !st.sound; this.setState({ sound: v }); this.persist({ sound: v }); },
+      toggleHaptics: () => { const v = !st.haptics; this.setState({ haptics: v }); this.persist({ haptics: v }); }
+    };
+  }
+}
+
+</script>
+
+
+</body></html>

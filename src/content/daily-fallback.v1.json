@@ -1,0 +1,52 @@
+{
+  "generatorVersion": 1,
+  "contentVersion": 2,
+  "puzzle": {
+    "gridSize": 4,
+    "cellTypes": [
+      "cross",
+      "col",
+      "col",
+      "cross",
+      "row",
+      "cross",
+      "cross",
+      "col",
+      "cross",
+      "cross",
+      "col",
+      "cross",
+      "cross",
+      "cross",
+      "cross",
+      "cross"
+    ],
+    "initialState": [
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "optimalMoves": 5,
+    "difficulty": "normal",
+    "optimalSolution": [
+      1,
+      2,
+      4,
+      13,
+      14
+    ]
+  }
+}
