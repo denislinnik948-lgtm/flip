@@ -17,9 +17,19 @@ const LETTERS = ['F', 'L', 'I', 'P'] as const;
 /** The "I" is the flipped tile. */
 const FLIPPED_INDEX = 2;
 
-export function Wordmark({ size = 56, dark = false }: { size?: number; dark?: boolean }) {
+export function Wordmark({
+  size = 56,
+  dark = false,
+  full = true,
+}: {
+  size?: number;
+  dark?: boolean;
+  /** Show "FIELD" beneath, making the mark read as the app's full name. */
+  full?: boolean;
+}) {
   return (
-    <View style={styles.row} accessibilityRole="header" accessibilityLabel="FLIP">
+    <View style={styles.lockup} accessibilityRole="header" accessibilityLabel="Flip Field">
+      <View style={styles.row}>
       {LETTERS.map((ch, i) => {
         const flipped = i === FLIPPED_INDEX;
 
@@ -67,6 +77,31 @@ export function Wordmark({ size = 56, dark = false }: { size?: number; dark?: bo
           </View>
         );
       })}
+      </View>
+
+      {/* The store name is "Flip Field"; the mark is four tiles spelling FLIP.
+          A tracked second line reconciles the two without turning the logo
+          into ten tiles. */}
+      {full ? (
+        <Text
+          style={[
+            styles.second,
+            {
+              // Floored: the About screen renders the mark at 34, where a
+              // purely proportional 6.7pt line would be unreadable.
+              fontSize: Math.max(size * 0.196, 9),
+              letterSpacing: size * 0.13,
+              color: dark ? 'rgba(247,247,245,.55)' : colors.muted,
+              marginTop: size * 0.2,
+              // Letter-spacing also trails the final glyph, so a centred text
+              // box sits half a tracking unit left of true centre. Nudge back.
+              marginLeft: size * 0.065,
+            },
+          ]}
+        >
+          FIELD
+        </Text>
+      ) : null}
     </View>
   );
 }
@@ -111,7 +146,9 @@ export function StudioMark({ dark = false }: { dark?: boolean }) {
 }
 
 const styles = StyleSheet.create({
+  lockup: { alignItems: 'center' },
   row: { flexDirection: 'row', gap: 8 },
+  second: { fontWeight: '500' },
   tile: { alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
   letter: { fontWeight: '500', letterSpacing: 0.21 },
   studio: { alignItems: 'center', gap: 9, paddingTop: 30, paddingBottom: 16 },

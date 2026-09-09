@@ -108,7 +108,15 @@ const styles = StyleSheet.create({
   rowLabel: { fontSize: 13, color: colors.text },
   rowRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   rowValue: { ...type.label, fontWeight: '400', color: colors.mutedStrong },
-  aboutBody: { flex: 1, justifyContent: 'center', gap: 22, paddingBottom: 40 },
+  // flex-start so the wordmark lockup hugs its content and stays left with
+  // the copy beneath it, rather than stretching and centring itself.
+  aboutBody: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    gap: 22,
+    paddingBottom: 40,
+  },
   aboutText: { ...type.body, color: '#4A4A45', maxWidth: 250 },
   version: { ...type.meta, letterSpacing: 1.2, color: colors.muted },
   legal: { flexDirection: 'row', gap: 20 },
