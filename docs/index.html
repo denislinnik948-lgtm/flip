@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLIP — Support</title>
+<meta name="description" content="Support for FLIP, a minimalist logic game.">
+<link rel="icon" href="icon.png">
+<style>
+  :root { --bg:#F7F7F5; --surface:#FBFBF9; --ink:#2A2A29; --muted:#8B8B85; --hairline:#E4E4E0; --off:#E7E7E4; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,"SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.6; }
+  .wrap { max-width:640px; margin:0 auto; padding:56px 24px 80px; }
+  .mark { display:flex; gap:8px; margin-bottom:40px; }
+  .tile { width:44px; height:44px; border-radius:10px; background:var(--off);
+    border:1px solid rgba(42,42,41,.055); display:flex; align-items:center;
+    justify-content:center; font-size:17px; font-weight:500; }
+  .tile.on { background:var(--ink); color:var(--bg); border-color:transparent; }
+  h1 { font-size:30px; font-weight:500; letter-spacing:-.02em; margin:0 0 8px; }
+  h2 { font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase;
+    margin:44px 0 14px; }
+  p, li { font-size:15px; margin:0 0 14px; }
+  ul { padding-left:20px; margin:0 0 14px; }
+  a { color:var(--ink); text-decoration:underline; text-underline-offset:3px; }
+  .lede { color:var(--muted); font-size:15px; margin-bottom:8px; }
+  .card { background:var(--surface); border:1px solid var(--hairline);
+    border-radius:14px; padding:20px 22px; margin:0 0 14px; }
+  .card p:last-child { margin-bottom:0; }
+  hr { border:0; border-top:1px solid var(--hairline); margin:56px 0; }
+  footer { color:var(--muted); font-size:12px; letter-spacing:.1em; margin-top:56px; }
+  code { background:var(--off); padding:2px 6px; border-radius:5px; font-size:13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="mark" aria-label="FLIP">
+    <div class="tile">F</div><div class="tile">L</div>
+    <div class="tile on">I</div><div class="tile">P</div>
+  </div>
+
+  <h1>Support</h1>
+  <p class="lede">A minimalist logic game. Turn every tile on, one move at a time.</p>
+
+  <h2>Contact</h2>
+  <div class="card">
+    <p>Questions, bugs or feedback: <a href="mailto:denislinnik948@gmail.com">denislinnik948@gmail.com</a></p>
+    <p style="color:var(--muted);font-size:13px">Replies usually within a few days.</p>
+  </div>
+
+  <h2>How to play</h2>
+  <p>Tap a tile and it flips, along with some of its neighbours. Which neighbours
+     depends on the tile:</p>
+  <ul>
+    <li><strong>+</strong> flips the tile and the four around it</li>
+    <li><strong>—</strong> flips the whole row</li>
+    <li><strong>|</strong> flips the whole column</li>
+  </ul>
+  <p>Turn every tile on to finish. Every move is its own undo, so nothing is ever
+     lost — only counted.</p>
+
+  <h2>Common questions</h2>
+  <div class="card">
+    <p><strong>I ran out of moves.</strong> Each level allows four times the moves a
+       perfect solve needs. Tap TRY AGAIN — the board resets and your best score is
+       untouched.</p>
+  </div>
+  <div class="card">
+    <p><strong>Is every level solvable?</strong> Yes. Every board is checked by a
+       solver before it ships, and the shortest solution is known. There are no dead
+       ends.</p>
+  </div>
+  <div class="card">
+    <p><strong>I lost my progress.</strong> Progress is stored only on your device.
+       Deleting or reinstalling the app clears it, and there is no account to restore
+       it from.</p>
+  </div>
+  <div class="card">
+    <p><strong>Does it need internet?</strong> No. The game never connects to
+       anything.</p>
+  </div>
+
+  <h2>Privacy</h2>
+  <p>FLIP collects nothing. See the <a href="privacy.html">privacy policy</a>.</p>
+
+  <hr>
+
+  <h1>Підтримка</h1>
+  <p class="lede">Мінімалістична логічна гра. Увімкнути всі плитки, по одному ходу.</p>
+
+  <h2>Контакт</h2>
+  <div class="card">
+    <p>Питання, помилки чи відгуки: <a href="mailto:denislinnik948@gmail.com">denislinnik948@gmail.com</a></p>
+    <p style="color:var(--muted);font-size:13px">Зазвичай відповідаємо протягом кількох днів.</p>
+  </div>
+
+  <h2>Як грати</h2>
+  <p>Торкніться плитки — вона перевернеться разом із деякими сусідніми. Які саме,
+     залежить від плитки:</p>
+  <ul>
+    <li><strong>+</strong> перевертає плитку й чотири навколо неї</li>
+    <li><strong>—</strong> перевертає весь рядок</li>
+    <li><strong>|</strong> перевертає весь стовпець</li>
+  </ul>
+  <p>Щоб пройти рівень, увімкніть усі плитки. Кожен хід скасовує сам себе, тож нічого
+     не втрачається — лише рахується.</p>
+
+  <h2>Часті питання</h2>
+  <div class="card">
+    <p><strong>Закінчились ходи.</strong> Кожен рівень дає вчетверо більше ходів, ніж
+       потрібно для ідеального розв'язку. Натисніть ЩЕ РАЗ — дошка скинеться, а ваш
+       рекорд лишиться.</p>
+  </div>
+  <div class="card">
+    <p><strong>Чи всі рівні мають розв'язок?</strong> Так. Кожну дошку перевіряє
+       розв'язувач ще до випуску, і найкоротший шлях відомий. Глухих кутів немає.</p>
+  </div>
+  <div class="card">
+    <p><strong>Зник прогрес.</strong> Прогрес зберігається лише на пристрої.
+       Видалення чи перевстановлення застосунку стирає його, і відновити нема звідки —
+       акаунтів немає.</p>
+  </div>
+  <div class="card">
+    <p><strong>Чи потрібен інтернет?</strong> Ні. Гра ні до чого не підключається.</p>
+  </div>
+
+  <h2>Конфіденційність</h2>
+  <p>FLIP не збирає нічого. Див. <a href="privacy.html">політику конфіденційності</a>.</p>
+
+  <footer>LI STUDIO</footer>
+</div>
+</body>
+</html>

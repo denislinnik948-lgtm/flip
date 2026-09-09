@@ -22,13 +22,12 @@ These cannot be produced from the codebase.
 
 1. **Apple Developer Program membership** — $99/year. Nothing can be submitted
    without it.
-2. **Two public URLs.** Apple rejects submissions where these 404. The pages
-   are written and ready in the separate `flip-site` repo next to this one —
-   they live outside this repo because GitHub Pages cannot publish from a
-   private repo on a free plan. Create a public `flip-site` repo, push, and
-   enable Pages. The resulting URLs:
-   - Privacy policy — `https://<user>.github.io/flip-site/privacy.html`
-   - Support — `https://<user>.github.io/flip-site/`
+2. **Two public URLs.** Apple rejects submissions where these 404. Both pages
+   live in `docs/` and are served by GitHub Pages from this repo (Settings →
+   Pages → Branch `main`, folder `/docs`). This is why the repo is public: on a
+   free plan Pages cannot serve a private one.
+   - Privacy policy — `https://denislinnik948-lgtm.github.io/flip/privacy.html`
+   - Support — `https://denislinnik948-lgtm.github.io/flip/`
 3. **Screenshots.** Required: 6.9" iPhone (1320×2868). Apple reuses those for
    smaller devices. They must come from a real build — the web preview is not a
    substitute, and simulator frames are acceptable to Apple but must be genuine
