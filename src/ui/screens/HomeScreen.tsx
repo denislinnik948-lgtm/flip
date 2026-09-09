@@ -66,11 +66,18 @@ export function HomeScreen({ app }: { app: AppState }) {
       <View style={styles.row}>
         <SurfaceButton onPress={() => app.setScreen('levels')} style={styles.tile}>
           <GridIcon />
-          <Text style={styles.tileLabel}>{t.levels}</Text>
+          <Text style={styles.tileLabel} numberOfLines={1}>
+            {t.levels}
+          </Text>
         </SurfaceButton>
         <SurfaceButton onPress={() => app.setScreen('settings')} style={styles.tile}>
           <SlidersIcon />
-          <Text style={styles.tileLabel}>{t.settings}</Text>
+          {/* Ukrainian "НАЛАШТУВАННЯ" clears a 375pt screen with ~11pt to
+              spare. Below ~364pt, or with large accessibility type, it would
+              wrap and break the 48pt button — truncating degrades better. */}
+          <Text style={styles.tileLabel} numberOfLines={1}>
+            {t.settings}
+          </Text>
         </SurfaceButton>
       </View>
 
@@ -133,5 +140,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 9,
   },
-  tileLabel: { ...type.label, fontWeight: '400', letterSpacing: 1.54, color: colors.mutedStrong },
+  tileLabel: {
+    ...type.label,
+    fontWeight: '400',
+    letterSpacing: 1.54,
+    color: colors.mutedStrong,
+    flexShrink: 1,
+  },
 });

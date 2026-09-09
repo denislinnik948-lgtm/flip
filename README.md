@@ -60,7 +60,7 @@ on a physical device via Expo Go.
 | 13 | Haptics | done — tap, solve and failure feedback |
 | — | Move limit / loss | done — verified in browser, limit and recovery |
 | — | Device run | confirmed working in Expo Go |
-| 14 | Accessibility / responsive polish | partial — roles and labels in place |
+| 14 | Accessibility / responsive polish | roles and labels in place; layout verified at 375pt |
 | — | Localisation | done — English + Ukrainian, toggle in Settings |
 | 15 | QA / release prep | listing, policy and build config in `store/` |
 
@@ -162,6 +162,22 @@ The authored curve, all verified to have exactly the stated optimal move count:
 Level 10 opens at 4×4 / 7 moves — exactly level 9's shape and difficulty — so the
 seam between authored and generated content is invisible. From there the ramp
 climbs every other level to a ceiling of 15 moves on 5×5 and 10 on 4×4.
+
+## Responsive
+
+Verified at 375pt, the narrowest modern iPhone, in Ukrainian (the longer of the
+two languages). Nothing overflows or clips; a 5×5 board lands at 54pt cells,
+comfortably past the 44pt touch minimum.
+
+The tightest element is the SETTINGS button on Home: "НАЛАШТУВАННЯ" clears
+375pt with about 11pt to spare, and would start clipping below ~364pt. Both
+Home tile labels are `numberOfLines={1}` so that large accessibility type
+truncates rather than wrapping and breaking the 48pt button.
+
+To re-test a width, temporarily set `layout.screenMaxWidth` in `src/ui/theme.ts`
+— the app frame is what constrains the content, so narrowing it reproduces a
+narrow device exactly. Browser devtools viewport emulation does *not* work here:
+it changes `screen` but leaves `innerWidth` at the window size.
 
 ## Localisation
 
