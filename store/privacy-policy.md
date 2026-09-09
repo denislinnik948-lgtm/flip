@@ -41,7 +41,7 @@ version ships, and the App Store privacy labels will be updated with it.
 
 ## Contact
 
-Questions about this policy: **[CONTACT EMAIL — to be supplied]**
+Questions about this policy: **denislinnik948@gmail.com**
 
 ---
 
@@ -88,4 +88,4 @@ FLIP не збирає нічого. Гра не має акаунтів, не �
 
 ## Контакт
 
-Питання щодо цієї політики: **[КОНТАКТНА ПОШТА — потрібно вказати]**
+Питання щодо цієї політики: **denislinnik948@gmail.com**

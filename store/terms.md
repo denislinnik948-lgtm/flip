@@ -28,7 +28,7 @@ These terms may change with future versions. The current version always applies.
 
 ## Contact
 
-**[CONTACT EMAIL — to be supplied]**
+**denislinnik948@gmail.com**
 
 ---
 
@@ -62,4 +62,4 @@ FLIP надається безкоштовно для особистого ко�
 
 ## Контакт
 
-**[КОНТАКТНА ПОШТА — потрібно вказати]**
+**denislinnik948@gmail.com**
