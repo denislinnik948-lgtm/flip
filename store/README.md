@@ -33,9 +33,10 @@ These cannot be produced from the codebase.
    smaller devices. They must come from a real build — the web preview is not a
    substitute, and simulator frames are acceptable to Apple but must be genuine
    app screenshots.
-4. **The app name.** "FLIP" alone is very likely taken. App Store names are
-   globally unique, so decide a fallback before creating the record — see
-   `listing-en.md`.
+4. **The app name is `Flip Field`** — confirm it is still free in App Store
+   Connect before creating the record, since the name locks to it. "FLIP" alone
+   is taken by an existing game. See `listing-en.md` for the reasoning and
+   fallbacks.
 5. **Age rating questionnaire.** Answer "None" to every content question. The
    result is 4+.
 

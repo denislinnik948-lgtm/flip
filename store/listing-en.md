@@ -5,20 +5,23 @@ Character limits are Apple's. Counts are given so edits stay inside them.
 ## Name (30 max)
 
 ```
-FLIP — One Move at a Time
+Flip Field
 ```
 
-24 characters.
+10 characters.
 
-`FLIP` on its own is almost certainly taken — App Store names are globally
-unique and four-letter words go early. Fallbacks, in preference order:
+`FLIP` alone is taken — there is already a platform-jumping game under that
+exact name (App Store id 1173688324), and App Store names are globally unique.
 
-1. `FLIP — One Move at a Time`
-2. `FLIP: Logic Tiles`
-3. `FLIP Grid`
+Ten characters matters more than it looks: iOS truncates the name under the
+home-screen icon at roughly twelve characters. "FLIP — One Move at a Time"
+would render as "FLIP — On…", which reads as a bug. "Flip Field" fits whole.
 
-Check availability in App Store Connect *before* creating the app record; the
-name is locked to the record once made.
+It also sidesteps the crowded "Flip + object" shelf (Flip Tiles, Tile Flip,
+Flip Puzzles, Flippy Flip), several of which are the same game as this one.
+
+Still confirm availability in App Store Connect before creating the record —
+the name locks to it. Fallbacks: `Flip Field — Logic`, `Flip Field Puzzles`.
 
 ## Subtitle (30 max)
 

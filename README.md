@@ -3,6 +3,11 @@
 Production implementation of FLIP, per `FLIP_DEVELOPMENT_SPEC.md` (product/logic
 source of truth) and `FLIP Prototype (standalone).html` (visual source of truth).
 
+Ships on the App Store as **Flip Field** — "FLIP" alone is taken by an existing
+game, and App Store names are globally unique. The in-app wordmark stays FLIP:
+it is four tiles spelling F-L-I-P, and the store name is a listing field, not
+the brand.
+
 Target platform: **React Native + Expo SDK 57** (iOS + Android, one codebase).
 
 The SDK version is not incidental: Expo Go only runs projects on the current

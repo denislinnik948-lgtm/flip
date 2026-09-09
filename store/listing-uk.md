@@ -1,7 +1,8 @@
 # App Store listing — Ukrainian
 
 Ukrainian is added as a listing localisation in App Store Connect. The app name
-stays the same across localisations; everything below it can differ.
+("Flip Field") stays the same across localisations; everything below it can
+differ.
 
 ## Subtitle (30 max)
 
